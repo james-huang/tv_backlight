@@ -21,6 +21,7 @@ class PixelRenderer(Tkinter.Tk):
   |      |      |      |      |
   |______|______|______|______|
 
+
   """
 
   def __init__(self, parent):
@@ -28,8 +29,50 @@ class PixelRenderer(Tkinter.Tk):
     Tkinter.Tk.__init__(self, parent)
     self.parent = parent
 
-    self.frame = Tkinter.Frame(self, width=1000, height=800, bg="black")
+    self.frame = Tkinter.Frame(self, width=1010, height=610, bg="black")
     self.frame.grid()
+
+    self.top_left = Tkinter.Label(self.frame, text="TOPLEFT",
+        width=25, height=5, fg="gray", bg="red")
+    self.top_left.grid(row=0, column=0)
+
+    self.top_left_center = Tkinter.Label(self.frame, text="TOPLEFTCENTER",
+        width=25, height=5, fg="gray", bg="blue")
+    self.top_left_center.grid(row=0, column=1)
+
+    self.top_right_center = Tkinter.Label(self.frame, text="TOPRIGHTCENTER",
+        width=25, height=5, fg="gray", bg="green")
+    self.top_right_center.grid(row=0, column=2)
+
+    self.top_right = Tkinter.Label(self.frame, text="TOPRIGHT",
+        width=25, height=5, fg="gray", bg="yellow")
+    self.top_right.grid(row=0, column=3)
+
+    self.mid_left = Tkinter.Label(self.frame, text="MIDLEFT",
+        width=25, height=5, fg="gray", bg="purple")
+    self.mid_left.grid(row=1, column=0)
+
+    self.mid_right = Tkinter.Label(self.frame, text="MIDRIGHT",
+        width=25, height=5, fg="gray", bg="pink")
+    self.mid_right.grid(row=1, column=3)
+
+    self.bottom_left = Tkinter.Label(self.frame, text="BOTTOMLEFT",
+        width=25, height=5, fg="gray", bg="red")
+    self.bottom_left.grid(row=2, column=0)
+
+    self.bottom_left_center = Tkinter.Label(self.frame, text="BOTTOMLEFTCENTER",
+        width=25, height=5, fg="gray", bg="blue")
+    self.bottom_left_center.grid(row=2, column=1)
+
+    self.bottom_right_center = Tkinter.Label(self.frame, text="BOTTOMRIGHTCENTER",
+        width=25, height=5, fg="gray", bg="green")
+    self.bottom_right_center.grid(row=2, column=2)
+
+    self.bottom_right = Tkinter.Label(self.frame, text="BOTTOMRIGHT",
+        width=25, height=5, fg="gray", bg="yellow")
+    self.bottom_right.grid(row=2, column=3)
+
+    #self.top_right.configure(bg='#000000')
 
 
 if __name__ == "__main__":
