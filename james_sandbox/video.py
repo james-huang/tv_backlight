@@ -5,6 +5,7 @@
 #import os
 #import PIL.Image
 import struct
+from time import time
 
 import Quartz.CoreGraphics as CG
 
@@ -27,6 +28,8 @@ class PixelRenderer(Tkinter.Tk):
 
   """
 
+  FRAME_RATE_CHECK_FREQUENCY_MS = 10*1000
+
   def __init__(self, parent):
     print "__init__"
     Tkinter.Tk.__init__(self, parent)
@@ -35,17 +38,29 @@ class PixelRenderer(Tkinter.Tk):
     self.frame = Tkinter.Frame(self, width=1010, height=610, bg="black")
     self.frame.grid()
     self._init_pixels()
-
+    self.debug_display = Tkinter.Label(self.frame, text="DEBUG DISPLAY",
+        width=50, height=5, fg="gray", bg="black")
+    self.debug_display.grid(row=1, column=1, columnspan=2)
 
     # TODO:
     """
-    check refresh rate
-    average pixels
     screen capture area/smart border dectector
-
+    average pixels
     """
+    self.check_refresh_rate_start_seconds = time()
+    self.refresh_pixels_count = 0
+    self.after(self.FRAME_RATE_CHECK_FREQUENCY_MS, self._check_refresh_rate)
+    self.refresh_pixels()
 
-    #self.refresh_pixels()
+  def _check_refresh_rate(self):
+    current_time_seconds = time()
+    elapsed_time_seconds = current_time_seconds - self.check_refresh_rate_start_seconds
+    refresh_rate = self.refresh_pixels_count / elapsed_time_seconds
+    self.debug_display.configure(text="%s Hz"%refresh_rate)
+
+    self.refresh_pixels_count = 0
+    self.check_refresh_rate_start_seconds = current_time_seconds
+    self.after(self.FRAME_RATE_CHECK_FREQUENCY_MS, self._check_refresh_rate)
 
   def _init_pixels(self):
     self.top_left = Tkinter.Label(self.frame, text="TOPLEFT",
@@ -120,7 +135,9 @@ class PixelRenderer(Tkinter.Tk):
     self.bottom_right_center.configure(bg="#%s" % bottom_right_center_pixel)
     self.bottom_right.configure(bg="#%s" % bottom_right_pixel)
 
-    self.after(30, self.refresh_pixels)
+    self.refresh_pixels_count += 1
+    #self.refresh_pixels()
+    self.after(1, self.refresh_pixels)
 
   def cgimage_screen_capture(self, region=None):
     """
