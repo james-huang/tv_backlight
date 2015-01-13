@@ -15,7 +15,7 @@ from Tkinter import *
 class PixelRenderer(Tkinter.Tk):
   """
   This class is a software mockup of Physical LEDS mounted behind a TV.
-  THe pixel layout is:
+  The pixel layout is:
 
   -----------------------------
   |      |      |      |      |
@@ -67,7 +67,8 @@ class PixelRenderer(Tkinter.Tk):
 
     # these bounds are inclusive, and can be indexed
 
-    if False:
+    # TODO, move this into the constructor of the object
+    if True:
       self.left_bound = 0
       self.right_bound = 2879
       self.top_bound = 300
