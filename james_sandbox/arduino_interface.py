@@ -7,7 +7,7 @@ R: red intensity
 G: green intensity
 B: blue intensity
 """
-
+import glob
 import os
 import random
 import sys
@@ -15,7 +15,7 @@ import serial
 import time
 import signal
 
-PORT = '/dev/tty.usbmodem1451'
+PORT = glob.glob("/dev/tty.usbmodem*")[0]
 SPEED = 9600
 
 #def send_command(val):

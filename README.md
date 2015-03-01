@@ -21,6 +21,6 @@ Purpose: back light a tv based on video and audio
   - [http://arduino.cc/en/main/software](http://arduino.cc/en/main/software)
 - Adafruit NeoPixel Library
   - [https://github.com/adafruit/Adafruit_NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
-  - OR
   - In the Arduino IDE -> Sketch -> Import Library -> Add Library -> select arduino/Adafruit_NeoPixel.zip
-
+- pySerial
+  - sudo pip install pySerial

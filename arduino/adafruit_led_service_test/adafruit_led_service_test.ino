@@ -14,7 +14,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(15, PIN, NEO_GRB + NEO_KHZ800);
 void setup() {
   Serial.begin(9600);
   strip.begin();
-  strip.setBrightness(50);
+  strip.setBrightness(40);
   for (int x=0; x<15; x++) {
     strip.setPixelColor(x, 255, 0, 0);
   }
