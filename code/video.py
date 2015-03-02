@@ -44,6 +44,8 @@ class PixelRenderer(Tkinter.Tk):
 
   def __init__(self, parent):
     print "__init__"
+    # TODO (james) : run video.py without tkinter GUI
+    # give optional debug flag to turn on GUI?
     Tkinter.Tk.__init__(self, parent)
     self.parent = parent
 
@@ -85,6 +87,7 @@ class PixelRenderer(Tkinter.Tk):
     # these bounds are inclusive, and can be indexed
 
     # TODO, move this into the constructor of the object
+    # TODO this feels hack, clean this up, maybe move to daemon thread
     if True:
       self.left_bound = 0
       self.right_bound = 2879
@@ -189,6 +192,20 @@ class PixelRenderer(Tkinter.Tk):
     self.refresh_pixels_count += 1
     #self.refresh_pixels()
     self.after(30, self.refresh_pixels)# used to be 1
+    """
+    TODO (james) : i wonder if we can bumpt this down somehow
+    maybe ecoding RGB into a single int 4 byte value 0RGB
+    (255)RGB indicating last pixel group and flush buffer
+    """
+
+  def normalize_pixel(self, pixel_value):
+    """
+    TODO (james) : screen pixel values dont always correspond to arduino
+    pixel values. there might be an out of box library to fix this, otherwise
+    need to calibrate pixels manually
+
+    """
+    pass
 
   def cgimage_screen_capture(self, region=None):
     """
