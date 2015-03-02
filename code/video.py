@@ -5,7 +5,13 @@
 #import os
 #import PIL.Image
 import struct
-from time import time
+import glob
+import serial
+import signal
+from time import sleep, time
+
+ARDUINO_PORT = glob.glob("/dev/tty.usbmodem*")[0]
+ARDUINO_BAUD_RATE = 9600
 
 import Quartz.CoreGraphics as CG
 
@@ -54,6 +60,17 @@ class PixelRenderer(Tkinter.Tk):
     #self.top_bound = None
     #self.bottom_bound = None
     # TODO:
+
+
+    self.arduino_serial = serial.Serial(
+      ARDUINO_PORT,
+      baudrate=ARDUINO_BAUD_RATE,
+      stopbits=serial.STOPBITS_ONE,
+      timeout=1,
+    )
+    print "when a serial port is open the arduino runs reset. sleep 3 sec before sending commands"
+    sleep(3)
+
     """
     screen capture area/smart border dectector (use smallest/mode of border to avoid outliers)
     average pixels
@@ -139,18 +156,18 @@ class PixelRenderer(Tkinter.Tk):
 
     self.cgimage_screen_capture()
 
-    top_left_pixel = self.get_pixel(self.left_bound, self.top_bound)
-    top_left_center_pixel = self.get_pixel(self.left_bound + (self.right_bound - self.left_bound + 1)/3*1, self.top_bound)
-    top_right_center_pixel = self.get_pixel(self.left_bound + (self.right_bound - self.left_bound + 1)/3*2, self.top_bound)
-    top_right_pixel = self.get_pixel(self.right_bound, self.top_bound)
+    s8, top_left_pixel = self.get_pixel(self.left_bound, self.top_bound)
+    s7, top_left_center_pixel = self.get_pixel(self.left_bound + (self.right_bound - self.left_bound + 1)/3*1, self.top_bound)
+    s6, top_right_center_pixel = self.get_pixel(self.left_bound + (self.right_bound - self.left_bound + 1)/3*2, self.top_bound)
+    s5, top_right_pixel = self.get_pixel(self.right_bound, self.top_bound)
 
-    mid_left_pixel = self.get_pixel(self.left_bound, self.top_bound + (self.bottom_bound - self.top_bound + 1)/2)
-    mid_right_pixel = self.get_pixel(self.right_bound, self.top_bound + (self.bottom_bound - self.top_bound + 1)/2)
+    s9, mid_left_pixel = self.get_pixel(self.left_bound, self.top_bound + (self.bottom_bound - self.top_bound + 1)/2)
+    s4, mid_right_pixel = self.get_pixel(self.right_bound, self.top_bound + (self.bottom_bound - self.top_bound + 1)/2)
 
-    bottom_left_pixel = self.get_pixel(self.left_bound, self.bottom_bound)
-    bottom_left_center_pixel = self.get_pixel(self.left_bound + (self.right_bound - self.left_bound + 1)/3*1, self.bottom_bound)
-    bottom_right_center_pixel = self.get_pixel(self.left_bound + (self.right_bound - self.left_bound + 1)/3*2, self.bottom_bound)
-    bottom_right_pixel = self.get_pixel(self.right_bound, self.bottom_bound)
+    s0, bottom_left_pixel = self.get_pixel(self.left_bound, self.bottom_bound)
+    s1, bottom_left_center_pixel = self.get_pixel(self.left_bound + (self.right_bound - self.left_bound + 1)/3*1, self.bottom_bound)
+    s2, bottom_right_center_pixel = self.get_pixel(self.left_bound + (self.right_bound - self.left_bound + 1)/3*2, self.bottom_bound)
+    s3, bottom_right_pixel = self.get_pixel(self.right_bound, self.bottom_bound)
 
     self.top_left.configure(bg="#%s" % top_left_pixel, text=top_left_pixel)
     self.top_left_center.configure(bg="#%s" % top_left_center_pixel, text=top_left_center_pixel)
@@ -165,9 +182,13 @@ class PixelRenderer(Tkinter.Tk):
     self.bottom_right_center.configure(bg="#%s" % bottom_right_center_pixel, text=bottom_right_center_pixel)
     self.bottom_right.configure(bg="#%s" % bottom_right_pixel, text=bottom_right_pixel)
 
+    serial_info = s0 + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9 + "\n"
+    print "serial_info: ", serial_info
+    self.arduino_serial.write(serial_info)
+
     self.refresh_pixels_count += 1
     #self.refresh_pixels()
-    self.after(1, self.refresh_pixels)
+    self.after(30, self.refresh_pixels)# used to be 1
 
   def cgimage_screen_capture(self, region=None):
     """
@@ -212,8 +233,11 @@ class PixelRenderer(Tkinter.Tk):
     b, g, r = struct.unpack_from(data_format, self.screen_capture_byte_data, offset=offset)
 
     # Return BGRA as RGBA
-    return struct.pack('BBB', *(r, g, b)).encode('hex')
-
+    # the tkinter pixels want a RRGGBB hex value string
+    # the arduino wants RGB char string
+    tkinter_rgb_values = struct.pack('BBB', *(r, g, b)).encode('hex')
+    arduino_rgb_values = chr(r) + chr(g) + chr(b)
+    return tkinter_rgb_values, tkinter_rgb_values
 
   def detect_border(self):
     """
@@ -225,14 +249,14 @@ class PixelRenderer(Tkinter.Tk):
     row = self.screen_capture_height / 2
     # find bounding box left side
     for col in xrange(self.screen_capture_width):
-      tmp_pixel = self.get_pixel(col, row)
+      _, tmp_pixel = self.get_pixel(col, row)
       if tmp_pixel != "000000":
         self.left_bound = col
         break
 
     # find bounding box right side
     for col in xrange(self.screen_capture_width - 1, -1, -1):
-      tmp_pixel = self.get_pixel(col, row)
+      _, tmp_pixel = self.get_pixel(col, row)
       if tmp_pixel != "000000":
         self.right_bound = col
         break
@@ -240,14 +264,14 @@ class PixelRenderer(Tkinter.Tk):
     col = self.screen_capture_width / 2
     # find bounding box top
     for row in xrange(self.screen_capture_height):
-      tmp_pixel = self.get_pixel(col, row)
+      _, tmp_pixel = self.get_pixel(col, row)
       if tmp_pixel != "000000":
         self.top_bound = row
         break
 
     # find bounding box bottom
     for row in xrange(self.screen_capture_height - 1, -1, -1):
-      tmp_pixel = self.get_pixel(col, row)
+      _, tmp_pixel = self.get_pixel(col, row)
       if tmp_pixel != "000000":
         self.bottom_bound = row
         break

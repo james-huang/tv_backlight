@@ -8,7 +8,6 @@ G: green intensity
 B: blue intensity
 """
 import glob
-import os
 import random
 import sys
 import serial
@@ -38,7 +37,7 @@ time.sleep(3) # when a serial port is open the arduino runs reset sleep before s
 
 while True:
   s = ""
-  for i in xrange(20):
+  for i in xrange(30):
     s += chr(random.randint(0,255)) + chr(random.randint(0,255)) + chr(random.randint(0,255))
   print "s: ", s
   arduino_serial.write(s)
