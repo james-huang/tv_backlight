@@ -57,12 +57,6 @@ class PixelRenderer(Tkinter.Tk):
     self.debug_display.grid(row=1, column=1, columnspan=2)
 
     self.border_detection_count = 0
-    #self.left_bound = None
-    #self.right_bound = None
-    #self.top_bound = None
-    #self.bottom_bound = None
-    # TODO:
-
 
     self.arduino_serial = serial.Serial(
       ARDUINO_PORT,
@@ -85,9 +79,8 @@ class PixelRenderer(Tkinter.Tk):
     self.cgimage_screen_capture()
 
     # these bounds are inclusive, and can be indexed
-
     # TODO, move this into the constructor of the object
-    # TODO this feels hack, clean this up, maybe move to daemon thread
+    # TODO this feels hack, clean this up, maybe move border detection to daemon thread
     if True:
       self.left_bound = 0
       self.right_bound = 2879
