@@ -10,13 +10,21 @@
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(30, PIN, NEO_GRB + NEO_KHZ800);
 
+Adafruit_NeoPixel strip_test = Adafruit_NeoPixel(3, 10, NEO_GRB + NEO_KHZ800);
+
 void setup() {
   Serial.begin(9600);
   strip.begin();
   strip.setBrightness(100);
   for (int x=0; x<30; x++) {
-    strip.setPixelColor(x, 255, 0, 0);
+    strip.setPixelColor(x, 0, 0,255);
   }
+  strip_test.begin();
+  strip_test.setBrightness(100);
+  strip_test.setPixelColor(0, 255,0,0);
+  strip_test.setPixelColor(1, 255,0,0);
+  strip_test.setPixelColor(2, 255,0,0);
+  strip_test.show();
   strip.show(); // Initialize all pixels to 'off'
 }
 

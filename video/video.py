@@ -36,7 +36,7 @@ class PixelRenderer(Tkinter.Tk):
 
   FRAME_RATE_CHECK_INTERVAL_MS = 10*1000
   BORDER_DETECTION_START_BUFFER_MS = 500 #10*1000 #time to wait for a movie to launch
-  BORDER_DETECTION_INTERVAL_MS = 1000 #10*1000
+  BORDER_DETECTION_INTERVAL_MS = 10*1000#1000 #10*1000
   BORDER_DETECTION_MAX_TIMES = 8 #20 #times to run border detection at start of movie
 
   # VLC centers videos vertically slightly differently to shiftit.
@@ -79,9 +79,8 @@ class PixelRenderer(Tkinter.Tk):
     self.cgimage_screen_capture()
 
     # these bounds are inclusive, and can be indexed
-    # TODO, move this into the constructor of the object
     # TODO this feels hack, clean this up, maybe move border detection to daemon thread
-    if True:
+    if False: # TODO: figure out resolution when plugged into TV
       self.left_bound = 0
       self.right_bound = 2879
       self.top_bound = 300
@@ -178,8 +177,18 @@ class PixelRenderer(Tkinter.Tk):
     self.bottom_right_center.configure(bg="#%s" % bottom_right_center_pixel, text=bottom_right_center_pixel)
     self.bottom_right.configure(bg="#%s" % bottom_right_pixel, text=bottom_right_pixel)
 
-    serial_info = s0 + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9 + "\n"
-    print "serial_info: ", serial_info
+    serial_info = s0 + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9 + "\xff\xff\xff\xff"
+    #print "serial_info: ", serial_info
+    # print "0 %s"% ' '.join([str(ord(s)) for s in s0])
+    # print "1 %s"% ' '.join([str(ord(s)) for s in s1])
+    # print "2 %s"% ' '.join([str(ord(s)) for s in s2])
+    # print "3 %s"% ' '.join([str(ord(s)) for s in s3])
+    # print "4 %s"% ' '.join([str(ord(s)) for s in s4])
+    # print "5 %s"% ' '.join([str(ord(s)) for s in s5])
+    # print "6 %s"% ' '.join([str(ord(s)) for s in s6])
+    # print "7 %s"% ' '.join([str(ord(s)) for s in s7])
+    # print "8 %s"% ' '.join([str(ord(s)) for s in s8])
+    # print "9 %s"% ' '.join([str(ord(s)) for s in s9])
     self.arduino_serial.write(serial_info)
 
     self.refresh_pixels_count += 1
@@ -224,8 +233,6 @@ class PixelRenderer(Tkinter.Tk):
     self.screen_capture_width = CG.CGImageGetWidth(image)
     self.screen_capture_height = CG.CGImageGetHeight(image)
 
-
-
   def get_pixel(self, x, y):
     """
     Get pixel value at given (x,y) screen coordinates
@@ -246,8 +253,8 @@ class PixelRenderer(Tkinter.Tk):
     # the tkinter pixels want a RRGGBB hex value string
     # the arduino wants RGB char string
     tkinter_rgb_values = struct.pack('BBB', *(r, g, b)).encode('hex')
-    arduino_rgb_values = chr(r) + chr(g) + chr(b)
-    return tkinter_rgb_values, tkinter_rgb_values
+    arduino_rgb_values = chr(b) + chr(g) + chr(r) + chr(0)
+    return arduino_rgb_values, tkinter_rgb_values
 
   def detect_border(self):
     """

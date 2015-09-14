@@ -40,8 +40,9 @@ while True:
   for i in xrange(30):
     s += chr(random.randint(0,255)) + chr(random.randint(0,255)) + chr(random.randint(0,255))
   print "s: ", s
+  s += "\n"
   arduino_serial.write(s)
-  time.sleep(0.015)
+  time.sleep(2)#0.015
 
 
 arduino_serial.close()
